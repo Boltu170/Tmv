@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOD010837 – Topics 7 & 8 Interactive</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:‘Sora’,sans-serif;background:#f5f0e8;color:#1a1208;min-height:100vh;}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#003057;background-image:radial-gradient(ellipse at 70% 30%,#004478 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,#002040 0%,transparent 50%);}
+.login-box{background:#f5f0e8;border-radius:16px;padding:44px 40px;max-width:420px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.45);border:1px solid #d4c8a8;}
+.login-logo{font-size:30px;font-weight:800;color:#003057;margin-bottom:4px;letter-spacing:2px;text-transform:uppercase;}
+.login-sub{color:#5a4e3a;font-size:13px;margin-bottom:32px;font-weight:500;border-bottom:1px solid #c8b99a;padding-bottom:20px;}
+.login-label{font-size:12px;font-weight:700;color:#003057;margin-bottom:8px;display:block;text-transform:uppercase;letter-spacing:0.8px;}
+.login-input{width:100%;border:2px solid #c8b99a;border-radius:8px;padding:13px 16px;font-size:15px;font-family:‘Sora’,sans-serif;background:white;color:#1a1208;transition:border-color .2s;}
+.login-input:focus{outline:none;border-color:#003057;}
+.login-btn{width:100%;background:#003057;color:white;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:‘Sora’,sans-serif;margin-top:18px;transition:background .2s,transform .1s;letter-spacing:0.3px;}
+.login-btn:hover{background:#004478;transform:translateY(-1px);}
+.login-teacher-link{text-align:center;margin-top:16px;font-size:13px;color:#8a7a62;}
+.login-teacher-link a{color:#005a9e;cursor:pointer;text-decoration:none;font-weight:600;}
+.login-err{color:#8b1a1a;font-size:13px;margin-top:8px;display:none;}
+
+/* TOPBAR */
+.topbar{background:#003057;color:white;padding:11px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.35);border-bottom:3px solid #c8b99a;}
+.topbar-logo{font-weight:800;font-size:17px;letter-spacing:2px;text-transform:uppercase;}
+.topbar-sub{font-size:11px;opacity:.65;margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.score-badge{background:#c8b99a;color:#003057;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:800;}
+.student-name{font-size:13px;opacity:.75;}
+
+/* HERO */
+.hero{background:#003057;color:white;padding:32px 20px 0;text-align:center;}
+.hero h1{font-size:clamp(17px,4vw,26px);font-weight:800;letter-spacing:-0.3px;}
+.hero p{font-size:13px;opacity:.7;margin-top:6px;}
+.mode-tabs{display:flex;gap:0;justify-content:center;margin-top:24px;flex-wrap:wrap;background:#f5f0e8;border-top:3px solid #c8b99a;padding:0 12px;}
+.mode-tab{background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-3px;color:#5a4e3a;padding:13px 18px;cursor:pointer;font-family:‘Sora’,sans-serif;font-size:13px;font-weight:700;transition:all .2s;white-space:nowrap;}
+.mode-tab:hover{color:#003057;background:#e8dfc8;}
+.mode-tab.active{color:#003057;border-bottom-color:#003057;background:#f5f0e8;}
+
+/* MAIN */
+.main{max-width:820px;margin:0 auto;padding:24px 16px 80px;}
+.game-section{display:none;}
+.game-section.active{display:block;}
+
+/* CARD */
+.card{background:white;border-radius:12px;padding:22px;margin-bottom:16px;border:1px solid #ddd4bb;box-shadow:0 2px 8px rgba(0,48,87,.08);}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.card-num{background:#003057;color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+.card-title{font-size:15px;font-weight:700;color:#003057;line-height:1.4;}
+.card-meta{font-size:10px;color:#8a7a62;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;}
+
+/* PROGRESS */
+.prog-wrap{background:#e8dfc8;border-radius:4px;height:5px;margin-bottom:18px;}
+.prog-fill{background:#003057;height:5px;border-radius:4px;transition:width .4s;}
+
+/* MCQ OPTIONS */
+.options{display:flex;flex-direction:column;gap:8px;}
+.option{border:2px solid #ddd4bb;border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;line-height:1.5;transition:all .15s;background:white;text-align:left;font-family:‘Sora’,sans-serif;color:#1a1208;font-weight:500;}
+.option:hover:not(.locked){border-color:#003057;background:#e8dfc8;color:#003057;transform:translateX(3px);}
+.option.correct{background:#e6f4ec;border-color:#1a5c2e;color:#1a5c2e;}
+.option.wrong{background:#fae8e8;border-color:#8b1a1a;color:#8b1a1a;}
+.option.reveal{background:#e6f4ec;border-color:#1a5c2e;color:#1a5c2e;}
+
+/* TRUE/FALSE */
+.tf-btns{display:flex;gap:12px;margin-bottom:12px;}
+.tf-btn{flex:1;border:2px solid #ddd4bb;border-radius:10px;padding:16px;text-align:center;cursor:pointer;font-family:‘Sora’,sans-serif;font-size:15px;font-weight:700;transition:all .2s;background:white;color:#1a1208;}
+.tf-btn:hover:not(.locked){transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,48,87,.15);border-color:#003057;}
+.tf-btn.correct{background:#e6f4ec;border-color:#1a5c2e;color:#1a5c2e;}
+.tf-btn.wrong{background:#fae8e8;border-color:#8b1a1a;color:#8b1a1a;}
+.tf-btn.reveal{background:#e6f4ec;border-color:#1a5c2e;color:#1a5c2e;}
+
+/* FILL IN BLANK */
+.blank-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.blank-label{font-size:14px;font-weight:600;color:#003057;min-width:200px;}
+.blank-input{border:2px solid #c8b99a;border-radius:8px;padding:9px 14px;font-size:15px;font-family:‘JetBrains Mono’,monospace;width:160px;transition:border-color .2s;color:#1a1208;background:white;}
+.blank-input:focus{outline:none;border-color:#003057;}
+.blank-input.correct-inp{border-color:#1a5c2e;background:#e6f4ec;}
+.blank-input.wrong-inp{border-color:#8b1a1a;background:#fae8e8;}
+.check-blank-btn{background:#003057;color:white;border:none;border-radius:8px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘Sora’,sans-serif;transition:background .2s;}
+.check-blank-btn:hover{background:#004478;}
+
+/* DRAG */
+.drag-wrap{display:flex;gap:16px;flex-wrap:wrap;}
+.drag-pool,.drop-col{flex:1;min-width:220px;}
+.pool-label,.drop-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#8a7a62;margin-bottom:10px;}
+.drag-chip{display:block;background:#003057 !important;color:#ffffff !important;border-radius:7px;padding:10px 16px;margin-bottom:8px;cursor:grab;font-size:13px;font-weight:600;user-select:none;transition:opacity .15s,transform .1s;box-shadow:0 2px 6px rgba(0,48,87,.25);line-height:1.4;}
+.drag-chip:active{cursor:grabbing;opacity:.7;}
+.drag-chip.dragging{opacity:.4;}
+.drag-chip.chip-correct{background:#1a5c2e !important;color:#ffffff !important;}
+.drag-chip.chip-wrong{background:#8b1a1a !important;color:#ffffff !important;}
+.drop-zone{min-height:52px;border:2px dashed #c8b99a;border-radius:8px;padding:7px;margin-bottom:10px;background:#f5f0e8;transition:all .15s;}
+.drop-zone.drag-over{border-color:#003057;background:#e8dfc8;}
+.drop-zone-title{font-size:12px;font-weight:700;color:#003057;margin-bottom:5px;}
+.drag-check-btn{background:#003057;color:white;border:none;border-radius:8px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘Sora’,sans-serif;margin-right:8px;margin-top:12px;}
+.drag-reset-btn{background:#5a4e3a;color:white;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘Sora’,sans-serif;margin-top:12px;}
+
+/* FEEDBACK */
+.feedback{margin-top:14px;padding:12px 16px;border-radius:9px;font-size:14px;line-height:1.6;display:none;}
+.feedback.show{display:block;}
+.feedback.good{background:#e6f4ec;color:#1a5c2e;border-left:4px solid #1a5c2e;}
+.feedback.bad{background:#fae8e8;color:#8b1a1a;border-left:4px solid #8b1a1a;}
+.feedback.info{background:#fdf3dc;color:#7a4e00;border-left:4px solid #c8860a;}
+
+/* NEXT BTN */
+.next-btn{margin-top:14px;background:#003057;color:white;border:none;border-radius:8px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:‘Sora’,sans-serif;transition:background .2s;display:none;}
+.next-btn.show{display:inline-block;}
+.next-btn:hover{background:#004478;}
+
+/* SECTION TITLES */
+.sec-title{font-size:20px;font-weight:800;color:#003057;margin-bottom:4px;}
+.sec-sub{color:#5a4e3a;font-size:13px;margin-bottom:20px;font-weight:500;}
+
+/* SUMMARY */
+.summary-card{background:#003057;color:white;border-radius:14px;padding:36px;text-align:center;margin-top:16px;}
+.sum-score{font-size:64px;font-weight:800;line-height:1;color:#c8b99a;}
+.sum-label{font-size:15px;opacity:.75;margin-top:6px;}
+.sum-msg{font-size:17px;font-weight:700;margin-top:18px;}
+.restart-btn,.review-btn{background:#f5f0e8;color:#003057;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:800;cursor:pointer;font-family:‘Sora’,sans-serif;margin:10px 6px 0;transition:transform .2s;}
+.restart-btn:hover,.review-btn:hover{transform:scale(1.04);}
+.review-btn{background:#e8dfc8;}
+
+/* REVIEW PANEL */
+.review-panel{margin-top:20px;display:none;}
+.review-panel.show{display:block;}
+.review-item{background:white;border-radius:10px;padding:16px 20px;margin-bottom:12px;border-left:5px solid #c8b99a;}
+.review-item.r-correct{border-color:#1a5c2e;}
+.review-item.r-wrong{border-color:#8b1a1a;}
+.r-q{font-size:14px;font-weight:700;margin-bottom:8px;color:#1a1208;}
+.r-yours{font-size:13px;color:#5a4e3a;margin-bottom:4px;}
+.r-correct-ans{font-size:13px;color:#1a5c2e;font-weight:600;}
+.r-explain{font-size:13px;color:#1a1208;margin-top:6px;line-height:1.6;background:#e6f4ec;padding:8px 12px;border-radius:6px;}
+.r-explain.wrong-ex{background:#fae8e8;color:#8b1a1a;}
+
+/* TEACHER PANEL */
+.teacher-panel{background:#0d2200;color:white;border-radius:12px;padding:24px;margin-top:20px;}
+.teacher-panel h2{font-size:17px;margin-bottom:16px;color:#88cc88;}
+.t-section{margin-bottom:20px;}
+.t-section h3{font-size:13px;color:#aaddaa;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+.t-q{background:rgba(255,255,255,.07);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;line-height:1.6;}
+.t-q strong{color:#66ee88;}
+.teacher-close{background:rgba(255,255,255,.12);color:white;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:‘Sora’,sans-serif;margin-top:12px;}
+
+/* MISC */
+.info-box{background:#fdf3dc;border:1px solid #e8c870;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:14px;line-height:1.6;color:#1a1208;font-weight:500;}
+@media(max-width:580px){.drag-wrap{flex-direction:column;}.blank-label{min-width:100%;}.mode-tab{font-size:12px;padding:11px 12px;}}
+</style>
+
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">a.r.u.</div>
+    <div class="login-sub">MOD010837 – Financial Environment and Analysis</div>
+    <label class="login-label" for="name-input">Enter your name to begin</label>
+    <input class="login-input" id="name-input" type="text" placeholder="Your full name" autocomplete="off">
+    <div class="login-err" id="name-err">Please enter your name to continue.</div>
+    <button class="login-btn" onclick="startSession()">Start Activity →</button>
+    <div class="login-teacher-link"><a onclick="showTeacherLogin()">Teacher access</a></div>
+    <div id="teacher-login-row" style="display:none;margin-top:14px;">
+      <input class="login-input" id="teacher-pw" type="password" placeholder="Teacher password">
+      <button class="login-btn" style="background:#2D5016;margin-top:10px" onclick="checkTeacherPw()">Enter Teacher Mode</button>
+      <div class="login-err" id="pw-err">Incorrect password.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until login) -->
+
+<div id="app" style="display:none">
+  <div class="topbar">
+    <div>
+      <div class="topbar-logo">a.r.u.</div>
+      <div class="topbar-sub">MOD010837 – Topics 7 & 8</div>
+    </div>
+    <div class="topbar-right">
+      <div class="student-name" id="top-name"></div>
+      <div class="score-badge" id="score-badge">0 pts</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>Financial Environment & Analysis — Interactive</h1>
+    <p>Topics 7 & 8 · IPO · Investment Decisions · TVM · Appraisal Methods</p>
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('quiz',this)">🎯 Quiz</button>
+      <button class="mode-tab" onclick="switchMode('tf',this)">✅ True / False</button>
+      <button class="mode-tab" onclick="switchMode('drag',this)">🔀 Sort & Match</button>
+      <button class="mode-tab" onclick="switchMode('fill',this)">🧮 Calculate</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+```
+<!-- QUIZ -->
+<div class="game-section active" id="section-quiz">
+  <div class="sec-title">🎯 Quiz — Multiple Choice</div>
+  <div class="sec-sub" id="quiz-sub">Answer all questions to complete this section.</div>
+  <div class="prog-wrap"><div class="prog-fill" id="quiz-prog" style="width:0%"></div></div>
+  <div id="quiz-container"></div>
+  <div id="quiz-done" style="display:none"></div>
+</div>
+
+<!-- TRUE/FALSE -->
+<div class="game-section" id="section-tf">
+  <div class="sec-title">✅ True or False</div>
+  <div class="sec-sub">Decide if each statement is true or false. You'll get an explanation either way.</div>
+  <div class="prog-wrap"><div class="prog-fill" id="tf-prog" style="width:0%"></div></div>
+  <div id="tf-container"></div>
+  <div id="tf-done" style="display:none"></div>
+</div>
+
+<!-- DRAG & DROP -->
+<div class="game-section" id="section-drag">
+  <div class="sec-title">🔀 Sort & Match</div>
+  <div class="sec-sub">Drag each item to its correct category. On mobile: tap an item then tap the zone.</div>
+  <div id="drag-container"></div>
+</div>
+
+<!-- FILL / CALCULATE -->
+<div class="game-section" id="section-fill">
+  <div class="sec-title">🧮 Calculate</div>
+  <div class="sec-sub">Fill in each step of the IPO and TVM calculations. Press Check to see results.</div>
+  <div id="fill-container"></div>
+</div>
+```
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- TEACHER PANEL (injected dynamically) -->
+
+<script>
+// ============================================================
+// DATA BANKS
+// ============================================================
+const QUIZ_BANK = [
+  {id:'q1',topic:'T7',type:'mcq',q:"What does IPO stand for?",opts:["International Purchase Order","Initial Public Offering","Internal Profit Organisation","Investor Placement Option"],correct:1,explain:"IPO = Initial Public Offering. This is when a private company sells shares to the public for the first time through the primary market."},
+  {id:'q2',topic:'T7',type:'mcq',q:"Gross Proceeds from an IPO are calculated as:",opts:["Net Proceeds + Underwriting Fee","Number of Shares × IPO Offer Price","Market Cap × Underwriting Fee %","Existing Shares × Market Price"],correct:1,explain:"Gross Proceeds = Shares Issued × IPO Offer Price. This is the total raised BEFORE deducting any costs such as underwriting fees."},
+  {id:'q3',topic:'T7',type:'mcq',q:"A company issues 5 million shares at $20 each. The underwriting fee is 4%. What is the fee?",opts:["$2,000,000","$4,000,000","$800,000","$400,000"],correct:1,explain:"Gross Proceeds = 5m × $20 = $100m. Fee = 4% × $100m = $4,000,000."},
+  {id:'q4',topic:'T7',type:'mcq',q:"Which source of finance is LONG-TERM?",opts:["Trade credit","Bank overdraft","Corporate bond (10-year)","Commercial paper (3-month)"],correct:2,explain:"Corporate bonds have long maturities (5-30 years) and fund capital investment. The others are all short-term instruments."},
+  {id:'q5',topic:'T7',type:'mcq',q:"In the PRIMARY market, the money raised goes to:",opts:["The stock exchange","The investor who sold shares","The company issuing the shares","The underwriter"],correct:2,explain:"In the primary market, new securities are issued — the company receives the funds. In the secondary market, the money goes to the seller (an investor), not the company."},
+  {id:'q6',topic:'T7',type:'mcq',q:"Equity finance is permanent capital because:",opts:["It earns higher interest","It must be repaid in 10 years","It does not need to be repaid","It is guaranteed by government"],correct:2,explain:"Equity (share capital and retained earnings) does not need to be repaid. Dividends are optional — paid only when the company is profitable and chooses to distribute profit."},
+  {id:'q7',topic:'T7',type:'mcq',q:"HIGH gearing means a company has:",opts:["More equity than debt","More debt than equity","A high share price","More short-term assets"],correct:1,explain:"Gearing = debt relative to equity. High gearing = more debt than equity → higher financial risk due to fixed interest obligations."},
+  {id:'q8',topic:'T7',type:'mcq',q:"Post-IPO Market Capitalisation is calculated as:",opts:["Gross Proceeds × Fee %","Total Shares Outstanding × Post-IPO Market Price","Net Proceeds × IPO Price","Existing Shares × Gross Proceeds"],correct:1,explain:"Market Cap = Total Shares Outstanding (existing + new) × Post-IPO Market Price. This is the market's total valuation of the company."},
+  {id:'q9',topic:'T7',type:'mcq',q:"Which source of finance is MEDIUM-TERM?",opts:["Bank overdraft","Trade credit","Corporate bond","Hire purchase (3-year)"],correct:3,explain:"Hire purchase is medium-term (1-5 years): you buy an asset in instalments, and ownership transfers when the final payment is made."},
+  {id:'q10',topic:'T7',type:'mcq',q:"Net Proceeds to the firm = Gross Proceeds minus:",opts:["Only underwriting fee","Only other IPO expenses","Underwriting fee AND other IPO expenses","Nothing — net = gross"],correct:2,explain:"Net Proceeds = Gross Proceeds − Underwriting Fee − Other IPO Expenses. This is the actual cash the company receives after all flotation costs."},
+  {id:'q11',topic:'T8',type:'mcq',q:"The Time Value of Money states that:",opts:["Future money is worth more","Money loses value if invested too early","£1 today is worth MORE than £1 in the future","Inflation has no effect on returns"],correct:2,explain:"£1 today > £1 in the future because: (1) it can be invested to earn returns, (2) inflation reduces future purchasing power, and (3) future cash flows are uncertain."},
+  {id:'q12',topic:'T8',type:'mcq',q:"The Payback Period measures:",opts:["Total profit from an investment","Time to recover initial investment from cash inflows","% return on investment","Present value of future cash flows"],correct:1,explain:"Payback Period tells us how quickly the firm gets its money back. Shorter payback = less exposure to uncertainty."},
+  {id:'q13',topic:'T8',type:'mcq',q:"A project has NPV = −£15,000. The company should:",opts:["Accept — negative means profit","REJECT — expected to destroy value","Accept only if IRR is positive","Use payback period instead"],correct:1,explain:"NPV < 0 means the present value of future inflows is LESS than the investment cost. The project destroys value — REJECT."},
+  {id:'q14',topic:'T8',type:'mcq',q:"Firm invests £30,000, earns £6,000/year. Payback period?",opts:["3 years","4 years","5 years","6 years"],correct:2,explain:"Payback = £30,000 ÷ £6,000 = 5 years. For even (equal) cash flows, simply divide investment by annual inflow."},
+  {id:'q15',topic:'T8',type:'mcq',q:"Which appraisal method is considered most theoretically sound?",opts:["Payback Period","Accounting Rate of Return","Net Present Value (NPV)","Gearing Ratio"],correct:2,explain:"NPV is the most robust because it accounts for time value of money, considers all cash flows over the project's life, and directly measures value creation."},
+  {id:'q16',topic:'T8',type:'mcq',q:"IRR should be accepted when:",opts:["IRR > 100%","IRR < 0%","IRR > firm's required rate of return","IRR = Payback Period"],correct:2,explain:"Accept if IRR > required return (cost of capital). The project generates a higher % return than the firm's minimum acceptable rate."},
+  {id:'q17',topic:'T8',type:'mcq',q:"Future Value formula is:",opts:["FV = PV ÷ (1+r)ⁿ","FV = PV × (1+r)ⁿ","FV = PMT ÷ r","FV = PV + r × n"],correct:1,explain:"FV = PV × (1+r)ⁿ. This compounds today's value forward at interest rate r for n periods. The more periods, the larger the FV."},
+  {id:'q18',topic:'T8',type:'mcq',q:"A perpetuity pays £500/year forever. Required return = 5%. What is its present value?",opts:["£2,500","£10,000","£5,000","£500"],correct:1,explain:"PV of Perpetuity = PMT ÷ r = £500 ÷ 0.05 = £10,000. A perpetuity pays forever so you use this simple formula."},
+  {id:'q19',topic:'T8',type:'mcq',q:"IRR interpolation uses two discount rates. What condition must they meet?",opts:["Both must give positive NPV","Both must give negative NPV","One gives positive NPV (r1), one gives negative NPV (r2)","Both must equal the required return"],correct:2,explain:"For interpolation: r1 is the lower rate that gives a POSITIVE NPV, and r2 is the higher rate that gives a NEGATIVE NPV. The true IRR lies somewhere between them."},
+  {id:'q20',topic:'T8',type:'mcq',q:"A project has NPV = +£4,000 at 10% and NPV = -£2,000 at 16%. Using interpolation, the IRR is approximately:",opts:["12%","14%","13%","15%"],correct:1,explain:"IRR = 10% + [4,000 / (4,000 - (-2,000))] × (16% - 10%) = 10% + [4,000/6,000] × 6% = 10% + 0.667 × 6% = 10% + 4% = 14%."},
+];
+
+const TF_BANK = [
+  {id:'tf1',topic:'T7',q:"An IPO allows a PRIVATE company to sell shares to the public for the first time.",correct:true,explain:"TRUE. IPO = Initial Public Offering. A private company goes public by issuing shares on the primary market for the first time."},
+  {id:'tf2',topic:'T7',q:"In the secondary market, companies raise new capital when their shares are traded.",correct:false,explain:"FALSE. In the secondary market, existing shares trade between investors. The company does not receive any money — that only happens in the primary market."},
+  {id:'tf3',topic:'T7',q:"Equity finance must always be repaid with interest.",correct:false,explain:"FALSE. Equity has no mandatory repayment. Dividends are discretionary (optional), paid only when profitable. Debt finance (loans/bonds) requires interest and repayment."},
+  {id:'tf4',topic:'T7',q:"Medium-term finance typically covers periods from 1 to 5 years.",correct:true,explain:"TRUE. Medium-term finance (e.g. hire purchase, finance lease, medium-term loans) covers 1-5 years — bridging the gap between short-term and long-term finance."},
+  {id:'tf5',topic:'T7',q:"High gearing means a company has more equity than debt in its capital structure.",correct:false,explain:"FALSE. High gearing = MORE DEBT than equity. This increases financial risk because debt requires fixed interest and repayment obligations."},
+  {id:'tf6',topic:'T7',q:"Factoring is a short-term source of finance where a company sells its invoices to raise cash quickly.",correct:true,explain:"TRUE. Factoring allows firms to sell their outstanding invoices (debts owed by customers) to a factor (specialist firm) for immediate cash, improving short-term liquidity."},
+  {id:'tf7',topic:'T7',q:"Market capitalisation uses the IPO offer price, not the post-IPO market price.",correct:false,explain:"FALSE. Post-IPO Market Cap = Total Shares Outstanding × POST-IPO MARKET PRICE. The market price reflects what investors will pay in the open market, which may differ from the IPO offer price."},
+  {id:'tf8',topic:'T7',q:"Trade credit is a source of short-term finance.",correct:true,explain:"TRUE. Trade credit allows a business to buy goods/services now and pay the supplier later (e.g. 30-90 days). This helps manage working capital without formal borrowing."},
+  {id:'tf9',topic:'T8',q:"£1,000 received today is worth MORE than £1,000 received in 3 years.",correct:true,explain:"TRUE. This is the time value of money. Money today can be invested to earn returns, inflation reduces future purchasing power, and future cash is more uncertain."},
+  {id:'tf10',topic:'T8',q:"The payback period considers the time value of money.",correct:false,explain:"FALSE. The payback period does NOT adjust for time value. It simply counts years to recover the investment in nominal terms. This is one of its key weaknesses — NPV adjusts for timing."},
+  {id:'tf11',topic:'T8',q:"If NPV > 0, the investment should be accepted.",correct:true,explain:"TRUE. NPV > 0 means the present value of future cash inflows exceeds the cost. The investment creates value for shareholders — ACCEPT."},
+  {id:'tf12',topic:'T8',q:"IRR is the rate of return that makes NPV equal to zero.",correct:true,explain:"TRUE. The Internal Rate of Return (IRR) is the discount rate at which NPV = 0. If this rate exceeds the required return, the project is accepted."},
+  {id:'tf13',topic:'T8',q:"Forecasts used in investment appraisal are always accurate.",correct:false,explain:"FALSE. Forecasts are estimates based on assumptions about an uncertain future. Demand, costs, competition, and economic conditions may all differ from projections."},
+  {id:'tf14',topic:'T8',q:"PV of a perpetuity = PMT ÷ r",correct:true,explain:"TRUE. A perpetuity pays a fixed amount (PMT) forever. Its present value is simply PMT divided by the discount rate r. Example: £100/year at 5% = £100 ÷ 0.05 = £2,000."},
+  {id:'tf15',topic:'T8',q:"For uneven cash flows, payback uses the cumulative cash flow method.",correct:true,explain:"TRUE. When cash flows vary by year, you build a cumulative table and find the exact year the running total turns positive. Exact payback = years before recovery + (amount still needed ÷ that year's inflow)."},
+  {id:'tf16',topic:'T8',q:"In IRR interpolation, the rate r1 should give a POSITIVE NPV and r2 should give a NEGATIVE NPV.",correct:true,explain:"TRUE. IRR interpolation requires two trial rates that bracket the true IRR — r1 (lower rate, positive NPV) and r2 (higher rate, negative NPV). The formula estimates the IRR between these two points."},
+  {id:'tf17',topic:'T8',q:"If a project's IRR is 12% and the required return is 15%, the project should be accepted.",correct:false,explain:"FALSE. IRR (12%) < Required Return (15%) → REJECT. The project does not generate enough return to meet the firm's cost of capital. It would reduce shareholder value."},
+];
+
+const DRAG_SETS = [
+  {
+    id:'d1', title:"Sort: Finance by Term", topic:"Topics 7",
+    instruction:"Drag each source of finance to the correct column.",
+    categories:["Short-term (< 1 yr)","Medium-term (1–5 yrs)","Long-term (> 5 yrs)"],
+    items:[
+      {text:"Trade credit",cat:"Short-term (< 1 yr)"},
+      {text:"Bank overdraft",cat:"Short-term (< 1 yr)"},
+      {text:"Commercial paper",cat:"Short-term (< 1 yr)"},
+      {text:"Factoring",cat:"Short-term (< 1 yr)"},
+      {text:"Hire purchase (3 yr)",cat:"Medium-term (1–5 yrs)"},
+      {text:"Finance lease (4 yr)",cat:"Medium-term (1–5 yrs)"},
+      {text:"Medium-term bank loan",cat:"Medium-term (1–5 yrs)"},
+      {text:"Corporate bond (10 yr)",cat:"Long-term (> 5 yrs)"},
+      {text:"Equity / IPO",cat:"Long-term (> 5 yrs)"},
+      {text:"Retained earnings",cat:"Long-term (> 5 yrs)"},
+    ]
+  },
+  {
+    id:'d2', title:"Match: Appraisal Method → Key Question", topic:"Topic 8",
+    instruction:"Match each method to the question it answers.",
+    categories:["How quickly do I get my money back?","Does this create value (in £)?","What % return does this generate?"],
+    items:[
+      {text:"Payback Period",cat:"How quickly do I get my money back?"},
+      {text:"Net Present Value (NPV)",cat:"Does this create value (in £)?"},
+      {text:"Internal Rate of Return (IRR)",cat:"What % return does this generate?"},
+    ]
+  },
+  {
+    id:'d3', title:"Match: TVM Term → Meaning", topic:"Topic 8",
+    instruction:"Drag each term to its correct definition.",
+    categories:["Value today of a future sum","Value of money at a future date","Fixed payment series over set periods","Fixed payment forever"],
+    items:[
+      {text:"Present Value (PV)",cat:"Value today of a future sum"},
+      {text:"Future Value (FV)",cat:"Value of money at a future date"},
+      {text:"Annuity",cat:"Fixed payment series over set periods"},
+      {text:"Perpetuity",cat:"Fixed payment forever"},
+    ]
+  },
+];
+
+const FILL_SETS = [
+  {
+    id:'f1', title:"IPO Case: ZenithTech Inc.", topic:"Topic 7",
+    intro:"ZenithTech Inc. is planning an IPO. Use the data below to calculate each step.",
+    data:{"Shares to issue":"15,000,000","IPO offer price":"$40 per share","Underwriting fee":"6%","Other IPO expenses":"$2,500,000","Existing shares":"35,000,000","Post-IPO market price":"$38"},
+    steps:[
+      {label:"Gross Proceeds ($)",answer:600000000,tolerance:0.01,hint:"Shares × price",explain:"15,000,000 × $40 = $600,000,000. Gross proceeds = all money raised before any deductions."},
+      {label:"Underwriting Fee ($)",answer:36000000,tolerance:0.01,hint:"6% × gross",explain:"6% × $600,000,000 = $36,000,000. The fee paid to the investment bank managing the IPO."},
+      {label:"Net Proceeds ($)",answer:561500000,tolerance:0.01,hint:"Gross − fee − expenses",explain:"$600m − $36m − $2.5m = $561,500,000. This is the actual cash the company receives."},
+      {label:"Total Shares Post-IPO",answer:50000000,tolerance:0,hint:"Existing + new",explain:"35,000,000 + 15,000,000 = 50,000,000 total shares outstanding after the IPO."},
+      {label:"Market Cap ($)",answer:1900000000,tolerance:0.01,hint:"Total shares × $38",explain:"50,000,000 × $38 = $1,900,000,000 ($1.9 billion). Market cap uses the POST-IPO market price."},
+    ]
+  },
+  {
+    id:'f2', title:"TVM Calculations", topic:"Topic 8",
+    intro:"Apply the correct TVM formula to each question.",
+    data:{"FV =":"PV × (1+r)ⁿ","PV =":"FV ÷ (1+r)ⁿ","Perpetuity PV =":"PMT ÷ r"},
+    steps:[
+      {label:"FV of £4,000 at 5% for 3 yrs",answer:4630.50,tolerance:0.02,hint:"4000 × (1.05)^3",explain:"FV = £4,000 × (1.05)³ = £4,000 × 1.1576 = £4,630.50. Money invested today grows over time."},
+      {label:"PV of £9,000 in 2 yrs at 8%",answer:7716.05,tolerance:0.02,hint:"9000 ÷ (1.08)^2",explain:"PV = £9,000 ÷ (1.08)² = £9,000 ÷ 1.1664 = £7,716.05. Future money is worth less today."},
+      {label:"PV of £400/yr forever at 8%",answer:5000,tolerance:0.01,hint:"PMT ÷ r",explain:"PV of Perpetuity = £400 ÷ 0.08 = £5,000. A perpetuity pays forever — simple PMT ÷ r formula."},
+    ]
+  },
+  {
+    id:'f3', title:"NPV Appraisal — GreenPower Ltd", topic:"Topic 8",
+    intro:"GreenPower Ltd is evaluating a solar project. Initial investment: £80,000. Discount rate: 10%. Calculate the NPV step by step.",
+    data:{"Initial Investment":"£80,000","Discount rate":"10%","Year 1 cash flow":"£25,000","Year 2 cash flow":"£30,000","Year 3 cash flow":"£35,000","Year 4 cash flow":"£20,000","Discount factors (10%)":"Yr1=0.909, Yr2=0.826, Yr3=0.751, Yr4=0.683"},
+    steps:[
+      {label:"PV of Year 1 (£)",answer:22725,tolerance:0.01,hint:"25000 × 0.909",explain:"PV Year 1 = £25,000 × 0.909 = £22,725. We discount each cash flow to today's value."},
+      {label:"PV of Year 2 (£)",answer:24780,tolerance:0.01,hint:"30000 × 0.826",explain:"PV Year 2 = £30,000 × 0.826 = £24,780."},
+      {label:"PV of Year 3 (£)",answer:26285,tolerance:0.01,hint:"35000 × 0.751",explain:"PV Year 3 = £35,000 × 0.751 = £26,285."},
+      {label:"PV of Year 4 (£)",answer:13660,tolerance:0.01,hint:"20000 × 0.683",explain:"PV Year 4 = £20,000 × 0.683 = £13,660."},
+      {label:"Total PV of inflows (£)",answer:87450,tolerance:0.01,hint:"Add all 4 PV values",explain:"Total PV = £22,725 + £24,780 + £26,285 + £13,660 = £87,450."},
+      {label:"NPV (£)",answer:7450,tolerance:0.01,hint:"Total PV − £80,000",explain:"NPV = £87,450 − £80,000 = +£7,450. NPV > 0 → ACCEPT. The project creates £7,450 of value."},
+    ]
+  },
+  {
+    id:'f4', title:"IRR Interpolation — RiverBridge Ltd", topic:"Topic 8",
+    intro:"Use the IRR interpolation formula: IRR = r1 + [NPV1 ÷ (NPV1 − NPV2)] × (r2 − r1). RiverBridge has NPV = +£6,200 at 10% and NPV = −£3,100 at 18%.",
+    data:{"r1 (lower rate)":"10%","r2 (higher rate)":"18%","NPV at r1":"£6,200 (positive)","NPV at r2":"−£3,100 (negative)","Formula":"IRR = r1 + [NPV1 ÷ (NPV1 − NPV2)] × (r2 − r1)"},
+    steps:[
+      {label:"NPV1 − NPV2 (£)",answer:9300,tolerance:0.01,hint:"6200 − (−3100)",explain:"NPV1 − NPV2 = £6,200 − (−£3,100) = £6,200 + £3,100 = £9,300. Note: subtracting a negative = adding."},
+      {label:"NPV1 ÷ (NPV1 − NPV2)",answer:0.6667,tolerance:0.02,hint:"6200 ÷ 9300",explain:"£6,200 ÷ £9,300 = 0.6667. This is the proportion of the gap covered by NPV1."},
+      {label:"r2 − r1 (%)",answer:8,tolerance:0,hint:"18 − 10",explain:"r2 − r1 = 18% − 10% = 8%. This is the range between our two trial rates."},
+      {label:"IRR (%)",answer:15.33,tolerance:0.5,hint:"10 + (0.6667 × 8)",explain:"IRR = 10% + (0.6667 × 8%) = 10% + 5.33% = 15.33%. Since 15.33% > required return of 14% → ACCEPT."},
+    ]
+  },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let studentName = '';
+let totalScore = 0;
+let mobileSelected = null;
+
+// Per-section state
+let quizState = {questions:[], current:0, score:0, history:[]};
+let tfState = {questions:[], current:0, score:0, history:[]};
+
+// ============================================================
+// SEEDED SHUFFLE — personalised per student name
+// ============================================================
+function seededRandom(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+function seededShuffle(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function nameToSeed(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return Math.abs(h) || 42;
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function startSession() {
+  const n = document.getElementById('name-input').value.trim();
+  if (!n) { document.getElementById('name-err').style.display = 'block'; return; }
+  studentName = n;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('top-name').textContent = n;
+  initAll();
+}
+function showTeacherLogin() {
+  document.getElementById('teacher-login-row').style.display = 'block';
+}
+function checkTeacherPw() {
+  const pw = document.getElementById('teacher-pw').value;
+  if (pw === 'Boltu2025') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('top-name').textContent = 'Teacher';
+    studentName = 'Teacher';
+    initAll();
+    setTimeout(showTeacherPanel, 400);
+  } else {
+    document.getElementById('pw-err').style.display = 'block';
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('login-screen').style.display !== 'none') startSession();
+  }
+});
+
+// ============================================================
+// INIT ALL
+// ============================================================
+function initAll() {
+  const seed = nameToSeed(studentName);
+  const rng = seededRandom(seed);
+  const rng2 = seededRandom(seed + 999);
+
+  const shuffledQuiz = seededShuffle(QUIZ_BANK, rng).slice(0, 10);
+  const shuffledTF = seededShuffle(TF_BANK, rng2).slice(0, 8);
+
+  quizState = { questions: shuffledQuiz, current: 0, score: 0, history: [] };
+  tfState = { questions: shuffledTF, current: 0, score: 0, history: [] };
+
+  renderQuiz();
+  renderTF();
+  renderDrag();
+  renderFill();
+}
+
+// ============================================================
+// SCORE
+// ============================================================
+function addScore(pts) {
+  totalScore += pts;
+  document.getElementById('score-badge').textContent = totalScore + ' pts';
+}
+
+// ============================================================
+// MODE SWITCHER
+// ============================================================
+function switchMode(mode, el) {
+  document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + mode).classList.add('active');
+  el.classList.add('active');
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+function renderQuiz() {
+  const qs = quizState.questions;
+  const i = quizState.current;
+  document.getElementById('quiz-prog').style.width = (i / qs.length * 100) + '%';
+  document.getElementById('quiz-sub').textContent = `Question ${i + 1} of ${qs.length}`;
+
+  if (i >= qs.length) { showQuizDone(); return; }
+  const q = qs[i];
+  const html = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">${i+1}</div>
+        <div><div class="card-title">${q.q}</div><div class="card-meta">${q.topic}</div></div>
+      </div>
+      <div class="options" id="opts-q">
+        ${q.opts.map((o, oi) => `<button class="option" onclick="answerQuiz(${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-q"></div>
+      <button class="next-btn" id="next-q" onclick="nextQuiz()">Next →</button>
+    </div>`;
+  document.getElementById('quiz-container').innerHTML = html;
+}
+
+function answerQuiz(idx) {
+  const q = quizState.questions[quizState.current];
+  const opts = document.querySelectorAll('#opts-q .option');
+  opts.forEach(o => { o.classList.add('locked'); o.style.cursor = 'default'; });
+  const correct = idx === q.correct;
+  opts[idx].classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) opts[q.correct].classList.add('reveal');
+  const fb = document.getElementById('fb-q');
+  fb.classList.add('show', correct ? 'good' : 'bad');
+  fb.innerHTML = (correct ? '✅ <strong>Correct! +10 pts</strong>' : '❌ <strong>Not quite.</strong>') + '<br>' + q.explain;
+  if (correct) { quizState.score += 10; addScore(10); }
+  quizState.history.push({ q: q.q, yours: q.opts[idx], correct: q.opts[q.correct], explain: q.explain, ok: correct });
+  document.getElementById('next-q').classList.add('show');
+}
+
+function nextQuiz() { quizState.current++; renderQuiz(); }
+
+function showQuizDone() {
+  document.getElementById('quiz-container').innerHTML = '';
+  document.getElementById('quiz-prog').style.width = '100%';
+  const max = quizState.questions.length * 10;
+  const pct = quizState.score / max;
+  const msg = pct >= 0.8 ? '🌟 Excellent! Outstanding work.' : pct >= 0.6 ? '👍 Good effort! Check any you missed.' : '📚 Keep going — use your reference sheet and retry!';
+  document.getElementById('quiz-done').style.display = 'block';
+  document.getElementById('quiz-done').innerHTML = `
+    <div class="summary-card">
+      <div class="sum-score">${quizState.score}</div>
+      <div class="sum-label">out of ${max} points</div>
+      <div class="sum-msg">${msg}</div>
+      <button class="restart-btn" onclick="restartQuiz()">Try Again 🔄</button>
+      <button class="review-btn" onclick="toggleReview('quiz-review')">Review Answers 📋</button>
+    </div>
+    <div class="review-panel" id="quiz-review">${buildReview(quizState.history)}</div>`;
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-done').style.display = 'none';
+  document.getElementById('quiz-done').innerHTML = '';
+  const seed = nameToSeed(studentName);
+  const rng = seededRandom(seed + Date.now() % 1000);
+  quizState.questions = seededShuffle(QUIZ_BANK, rng).slice(0, 10);
+  quizState.current = 0; quizState.score = 0; quizState.history = [];
+  renderQuiz();
+}
+
+// ============================================================
+// TRUE / FALSE
+// ============================================================
+function renderTF() {
+  const qs = tfState.questions;
+  const i = tfState.current;
+  document.getElementById('tf-prog').style.width = (i / qs.length * 100) + '%';
+  if (i >= qs.length) { showTFDone(); return; }
+  const q = qs[i];
+  document.getElementById('tf-container').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">${i+1}</div>
+        <div><div class="card-title">${q.q}</div><div class="card-meta">${q.topic} · True or False?</div></div>
+      </div>
+      <div class="tf-btns">
+        <button class="tf-btn" id="tf-true" onclick="answerTF(true)">✅ TRUE</button>
+        <button class="tf-btn" id="tf-false" onclick="answerTF(false)">❌ FALSE</button>
+      </div>
+      <div class="feedback" id="fb-tf"></div>
+      <button class="next-btn" id="next-tf" onclick="nextTF()">Next →</button>
+    </div>`;
+}
+
+function answerTF(answer) {
+  const q = tfState.questions[tfState.current];
+  const tBtn = document.getElementById('tf-true');
+  const fBtn = document.getElementById('tf-false');
+  [tBtn, fBtn].forEach(b => { b.classList.add('locked'); b.style.cursor = 'default'; });
+  const correct = answer === q.correct;
+  const chosen = answer ? tBtn : fBtn;
+  chosen.classList.add(correct ? 'correct' : 'wrong');
+  const reveal = q.correct ? tBtn : fBtn;
+  if (!correct) reveal.classList.add('reveal');
+  const fb = document.getElementById('fb-tf');
+  fb.classList.add('show', correct ? 'good' : 'bad');
+  fb.innerHTML = (correct ? '✅ <strong>Correct! +8 pts</strong>' : '❌ <strong>Not quite.</strong>') + '<br>' + q.explain;
+  if (correct) { tfState.score += 8; addScore(8); }
+  tfState.history.push({ q: q.q, yours: answer ? 'TRUE' : 'FALSE', correct: q.correct ? 'TRUE' : 'FALSE', explain: q.explain, ok: correct });
+  document.getElementById('next-tf').classList.add('show');
+}
+
+function nextTF() { tfState.current++; renderTF(); }
+
+function showTFDone() {
+  document.getElementById('tf-container').innerHTML = '';
+  document.getElementById('tf-prog').style.width = '100%';
+  const max = tfState.questions.length * 8;
+  const pct = tfState.score / max;
+  const msg = pct >= 0.75 ? '🌟 Great work!' : pct >= 0.5 ? '👍 Solid effort — review the ones you missed.' : '📚 Review your reference sheet and try again!';
+  document.getElementById('tf-done').style.display = 'block';
+  document.getElementById('tf-done').innerHTML = `
+    <div class="summary-card">
+      <div class="sum-score">${tfState.score}</div>
+      <div class="sum-label">out of ${max} points</div>
+      <div class="sum-msg">${msg}</div>
+      <button class="restart-btn" onclick="restartTF()">Try Again 🔄</button>
+      <button class="review-btn" onclick="toggleReview('tf-review')">Review Answers 📋</button>
+    </div>
+    <div class="review-panel" id="tf-review">${buildReview(tfState.history)}</div>`;
+}
+
+function restartTF() {
+  document.getElementById('tf-done').style.display = 'none';
+  document.getElementById('tf-done').innerHTML = '';
+  const rng = seededRandom(nameToSeed(studentName) + Date.now() % 1000 + 999);
+  tfState.questions = seededShuffle(TF_BANK, rng).slice(0, 8);
+  tfState.current = 0; tfState.score = 0; tfState.history = [];
+  renderTF();
+}
+
+// ============================================================
+// REVIEW BUILDER
+// ============================================================
+function buildReview(history) {
+  return history.map((h, i) => `
+    <div class="review-item ${h.ok ? 'r-correct' : 'r-wrong'}">
+      <div class="r-q">Q${i+1}: ${h.q}</div>
+      <div class="r-yours">Your answer: <strong>${h.yours}</strong></div>
+      ${!h.ok ? `<div class="r-correct-ans">Correct answer: ${h.correct}</div>` : ''}
+      <div class="r-explain ${h.ok ? '' : 'wrong-ex'}">${h.explain}</div>
+    </div>`).join('');
+}
+
+function toggleReview(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+// ============================================================
+// DRAG & DROP
+// ============================================================
+function renderDrag() {
+  const container = document.getElementById('drag-container');
+  container.innerHTML = '';
+  DRAG_SETS.forEach((set, si) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    const catHTML = set.categories.map((cat, ci) => `
+      <div style="margin-bottom:10px">
+        <div class="drop-zone-title">${cat}</div>
+        <div class="drop-zone" id="dz-${si}-${ci}"
+          ondragover="dzOver(event)"
+          ondrop="dzDrop(event,${si},${ci})"
+          onclick="dzMobileDrop(${si},${ci})">
+          <div id="dz-content-${si}-${ci}" style="display:flex;flex-wrap:wrap;gap:5px;min-height:30px"></div>
+        </div>
+      </div>`).join('');
+    const chipsHTML = set.items.map((item, ii) => `
+      <div class="drag-chip" id="dc-${si}-${ii}"
+        draggable="true"
+        ondragstart="dcStart(event,${si},${ii})"
+        ondragend="dcEnd(event)"
+        onclick="dcMobileSelect(${si},${ii})">
+        ${item.text}
+      </div>`).join('');
+    div.innerHTML = `
+      <div class="card-header">
+        <div class="card-num">${si+1}</div>
+        <div><div class="card-title">${set.title}</div><div class="card-meta">${set.topic}</div></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">${set.instruction} <em>(Mobile: tap item then tap zone)</em></p>
+      <div class="drag-wrap">
+        <div class="drag-pool">
+          <div class="pool-label">Items</div>
+          <div id="dp-${si}">${chipsHTML}</div>
+        </div>
+        <div class="drop-col">
+          <div class="drop-label">Categories</div>
+          ${catHTML}
+        </div>
+      </div>
+      <div>
+        <button class="drag-check-btn" onclick="checkDrag(${si})">Check ✓</button>
+        <button class="drag-reset-btn" onclick="resetDrag(${si})">Reset 🔄</button>
+      </div>
+      <div class="feedback" id="dfb-${si}"></div>`;
+    container.appendChild(div);
+  });
+}
+
+function dcStart(e, si, ii) {
+  e.dataTransfer.setData('si', si); e.dataTransfer.setData('ii', ii);
+  document.getElementById(`dc-${si}-${ii}`).classList.add('dragging');
+}
+function dcEnd(e) { document.querySelectorAll('.drag-chip').forEach(c => c.classList.remove('dragging')); }
+function dzOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dzDrop(e, si, ci) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  const fsi = e.dataTransfer.getData('si'), ii = e.dataTransfer.getData('ii');
+  moveChip(fsi, ii, si, ci);
+}
+function dcMobileSelect(si, ii) {
+  const el = document.getElementById(`dc-${si}-${ii}`);
+  if (mobileSelected && mobileSelected.si == si && mobileSelected.ii == ii) { mobileSelected = null; document.querySelectorAll('.drag-chip').forEach(c => c.style.outline = ''); return; }
+  document.querySelectorAll('.drag-chip').forEach(c => c.style.outline = '');
+  mobileSelected = {si, ii}; el.style.outline = '3px solid #ff8800';
+}
+function dzMobileDrop(si, ci) {
+  if (!mobileSelected) return;
+  moveChip(mobileSelected.si, mobileSelected.ii, si, ci);
+  mobileSelected = null; document.querySelectorAll('.drag-chip').forEach(c => c.style.outline = '');
+}
+function moveChip(fsi, ii, si, ci) {
+  const el = document.getElementById(`dc-${fsi}-${ii}`);
+  if (!el) return;
+  document.getElementById(`dz-content-${si}-${ci}`).appendChild(el);
+  el.style.outline = '';
+}
+function checkDrag(si) {
+  const set = DRAG_SETS[si];
+  let correct = 0;
+  set.items.forEach((item, ii) => {
+    const el = document.getElementById(`dc-${si}-${ii}`);
+    if (!el) return;
+    el.classList.remove('chip-correct','chip-wrong');
+    set.categories.forEach((cat, ci) => {
+      const zone = document.getElementById(`dz-content-${si}-${ci}`);
+      if (zone && zone.contains(el)) {
+        if (cat === item.cat) { el.classList.add('chip-correct'); correct++; }
+        else el.classList.add('chip-wrong');
+      }
+    });
+  });
+  const fb = document.getElementById(`dfb-${si}`);
+  fb.classList.remove('good','bad'); fb.classList.add('show');
+  if (correct === set.items.length) {
+    addScore(20); fb.classList.add('good');
+    fb.textContent = `✅ Perfect! All ${correct} correct. +20 pts`;
+  } else {
+    fb.classList.add('bad');
+    fb.textContent = `Got ${correct}/${set.items.length} correct. Green = correct placement, red = wrong. Reset to try again.`;
+  }
+}
+function resetDrag(si) {
+  const set = DRAG_SETS[si];
+  const pool = document.getElementById(`dp-${si}`);
+  set.items.forEach((_, ii) => {
+    const el = document.getElementById(`dc-${si}-${ii}`);
+    if (el) { el.classList.remove('chip-correct','chip-wrong'); pool.appendChild(el); }
+  });
+  const fb = document.getElementById(`dfb-${si}`);
+  fb.classList.remove('show','good','bad'); fb.textContent = '';
+}
+
+// ============================================================
+// FILL / CALCULATE
+// ============================================================
+function renderFill() {
+  const container = document.getElementById('fill-container');
+  container.innerHTML = '';
+  FILL_SETS.forEach((set, si) => {
+    const dataRows = Object.entries(set.data).map(([k,v]) => `
+      <div style="display:flex;gap:12px;padding:7px 0;border-bottom:1px solid var(--border)">
+        <span style="font-weight:600;min-width:200px;font-size:13px;color:var(--aru)">${k}</span>
+        <span style="font-size:13px">${v}</span>
+      </div>`).join('');
+    const stepsHTML = set.steps.map((step, sti) => `
+      <div class="blank-row">
+        <div class="blank-label">${step.label}</div>
+        <input class="blank-input" type="number" id="fi-${si}-${sti}" placeholder="Your answer">
+        <span style="font-size:12px;color:var(--muted)">Hint: ${step.hint}</span>
+      </div>`).join('');
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <div class="card-header">
+        <div class="card-num">${si+1}</div>
+        <div><div class="card-title">${set.title}</div><div class="card-meta">${set.topic}</div></div>
+      </div>
+      <div style="background:#f9fafb;border:1px solid var(--border);border-radius:9px;padding:16px;margin-bottom:16px">
+        <div style="font-weight:700;color:var(--aru);margin-bottom:10px;font-size:14px">Data:</div>
+        ${dataRows}
+      </div>
+      <div class="info-box">${set.intro}</div>
+      ${stepsHTML}
+      <button class="check-blank-btn" onclick="checkFill(${si})">Check Answers ✓</button>
+      <button class="drag-reset-btn" onclick="resetFill(${si})" style="margin-left:8px">Reset 🔄</button>
+      <div class="feedback" id="ffb-${si}"></div>`;
+    container.appendChild(div);
+  });
+}
+
+function checkFill(si) {
+  const set = FILL_SETS[si];
+  let correct = 0;
+  let explanations = [];
+  set.steps.forEach((step, sti) => {
+    const inp = document.getElementById(`fi-${si}-${sti}`);
+    const val = parseFloat(inp.value.replace(/,/g,''));
+    inp.classList.remove('correct-inp','wrong-inp');
+    const ok = !isNaN(val) && Math.abs(val - step.answer) / (step.answer || 1) <= step.tolerance;
+    inp.classList.add(ok ? 'correct-inp' : 'wrong-inp');
+    if (ok) correct++;
+    explanations.push(`<strong>${step.label}:</strong> ${ok ? '✅' : '❌ Answer: ' + step.answer.toLocaleString() + '.'} ${step.explain}`);
+  });
+  const fb = document.getElementById(`ffb-${si}`);
+  fb.classList.remove('good','bad','info'); fb.classList.add('show');
+  if (correct === set.steps.length) {
+    addScore(25); fb.classList.add('good');
+    fb.innerHTML = `✅ <strong>All correct! +25 pts</strong><br><br>${explanations.join('<br><br>')}`;
+  } else {
+    fb.classList.add('info');
+    fb.innerHTML = `Got ${correct}/${set.steps.length} correct. Green = correct, red = wrong.<br><br>${explanations.join('<br><br>')}`;
+  }
+}
+
+function resetFill(si) {
+  FILL_SETS[si].steps.forEach((_, sti) => {
+    const inp = document.getElementById(`fi-${si}-${sti}`);
+    inp.value = ''; inp.classList.remove('correct-inp','wrong-inp');
+  });
+  const fb = document.getElementById(`ffb-${si}`);
+  fb.classList.remove('show','good','bad','info'); fb.textContent = '';
+}
+
+// ============================================================
+// TEACHER PANEL
+// ============================================================
+function showTeacherPanel() {
+  if (document.getElementById('teacher-panel-main')) return;
+  const all = [...QUIZ_BANK, ...TF_BANK];
+  const t7q = QUIZ_BANK.filter(q=>q.topic==='T7');
+  const t8q = QUIZ_BANK.filter(q=>q.topic==='T8');
+  const t7tf = TF_BANK.filter(q=>q.topic==='T7');
+  const t8tf = TF_BANK.filter(q=>q.topic==='T8');
+
+  function qList(items) {
+    return items.map(q => {
+      if (q.type === 'mcq') return `<div class="t-q"><strong>Q:</strong> ${q.q}<br><strong>Answer:</strong> ${q.opts[q.correct]}<br><em>${q.explain}</em></div>`;
+      return `<div class="t-q"><strong>Q:</strong> ${q.q}<br><strong>Answer:</strong> ${q.correct ? 'TRUE' : 'FALSE'}<br><em>${q.explain}</em></div>`;
+    }).join('');
+  }
+
+  const dragAnswers = DRAG_SETS.map(s => `<div class="t-q"><strong>${s.title}</strong><br>${s.items.map(i=>`${i.text} → <strong>${i.cat}</strong>`).join(' | ')}</div>`).join('');
+  const fillAnswers = FILL_SETS.map(s => `<div class="t-q"><strong>${s.title}</strong><br>${s.steps.map(st=>`${st.label}: <strong>${st.answer.toLocaleString()}</strong> — ${st.explain}`).join('<br>')}</div>`).join('');
+
+  const panel = document.createElement('div');
+  panel.className = 'teacher-panel';
+  panel.id = 'teacher-panel-main';
+  panel.innerHTML = `
+    <h2>🔑 Teacher Answer Reference — Boltu2025</h2>
+    <div class="t-section"><h3>Topic 7 — Quiz (MCQ)</h3>${qList(t7q)}</div>
+    <div class="t-section"><h3>Topic 8 — Quiz (MCQ)</h3>${qList(t8q)}</div>
+    <div class="t-section"><h3>Topic 7 — True/False</h3>${qList(t7tf)}</div>
+    <div class="t-section"><h3>Topic 8 — True/False</h3>${qList(t8tf)}</div>
+    <div class="t-section"><h3>Sort & Match Answers</h3>${dragAnswers}</div>
+    <div class="t-section"><h3>Calculate — Correct Answers</h3>${fillAnswers}</div>
+    <button class="teacher-close" onclick="this.closest('.teacher-panel').style.display='none'">Close ✕</button>`;
+  document.querySelector('.main').appendChild(panel);
+}
+</script>
+
+</body>
+</html>
